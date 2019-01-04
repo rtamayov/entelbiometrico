@@ -24,3 +24,4 @@ public class ExampleInstrumentedTest {
         assertEquals("com.entel.cardiles.lowcompreader", appContext.getPackageName());
     }
 }
+//test
