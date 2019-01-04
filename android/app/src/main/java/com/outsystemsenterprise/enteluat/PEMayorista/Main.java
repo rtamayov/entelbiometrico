@@ -35,6 +35,8 @@ import com.digitalpersona.uareu.UareUException;
 import com.digitalpersona.uareu.dpfpddusbhost.DPFPDDUsbHost;
 import com.digitalpersona.uareu.dpfpddusbhost.DPFPDDUsbException;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -174,6 +176,7 @@ public class Main extends Activity {
         if(requestCode == STORAGE_PERMISSION_CODE){
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 btnMorpho.setEnabled(true);
+                btnEikon.setEnabled(true);
                 crearDirectorios();
             } else {
                 showToast("No se otorgaron Permisos");
@@ -193,7 +196,7 @@ public class Main extends Activity {
             public void onSuccess(ZyResponse zyResponse)  {
                 //showToast(zyResponse.sensorName+"\n"+zyResponse.productDescriptor);
                 showToast("Huella Obtenida\nCreando Archivo");
-                guardarWSQ(zyResponse);
+                guardarWSQ(formatToBase64(zyResponse.wsq));
             }
 
             @Override
@@ -205,7 +208,7 @@ public class Main extends Activity {
         iBioCapture.capturar(zyRequest);
     }
 
-    private void guardarWSQ(ZyResponse response){
+    private void guardarWSQ(String response){
         Log.i(TAG,"guardarWSQ:init");
         try{
             //File file = new File(directorioWSQ_PATH, tvReceivedMsg.getText() + OUTPUT_FILE_EXTENSION);
@@ -214,7 +217,7 @@ public class Main extends Activity {
 
             Log.i(TAG,"guardarWSQ:file2save: " + file.getAbsolutePath());
             FileOutputStream fos = new FileOutputStream(file);
-            fos.write(formatToBase64(response.wsq).getBytes());
+            fos.write(response.getBytes());
             fos.close();
         } catch (IOException e){
             e.printStackTrace();
@@ -271,11 +274,14 @@ public class Main extends Activity {
     }
 
     private void initializeEikon(){
+        Log.i(TAG,"initailizeEikon:init step: "+ EIKON_STEP);
         if(EIKON_STEP == 0){
             Intent intent = new Intent(Main.this, EikonActivity.class);
+            intent.putExtra("EIKON_STEP",EIKON_STEP);
             startActivityForResult(intent, FIRST_CHECK);
         } else if (EIKON_STEP == 1 && eikon_serial_number.length() > 0){
             Intent intent = new Intent(Main.this, EikonActivity.class);
+            intent.putExtra("EIKON_STEP",EIKON_STEP);
             intent.putExtra("eikon_serial_number",eikon_serial_number);
             startActivityForResult(intent, SECOND_SCAN);
         } else {
@@ -306,6 +312,7 @@ public class Main extends Activity {
 
                             if(DPFPDDUsbHost.DPFPDDUsbCheckAndRequestPermissions(this.getApplicationContext(),mPermissionIntent,eikon_device_name)){
                                 CheckDevice();
+                                EIKON_STEP = 1;
                             }
                         }
                     } catch (UareUException e){
@@ -317,10 +324,45 @@ public class Main extends Activity {
 
                 break;
             case SECOND_SCAN:
+                Log.i(TAG, "ON RESULT OF SCAN");
+
+                if(resultCode == Activity.RESULT_OK){
+                    Log.i(TAG, "RESULT OF SCAN STATUS - OK");
+
+                    String imageBase64 = data.getStringExtra("imageBase64");
+                    String wsqBase64 = data.getStringExtra("wsqBase64");
+
+                    Log.i(TAG,"imageBase64: "+imageBase64);
+                    Log.i(TAG,"wsqBase64: "+wsqBase64);
+
+
+
+                    try {
+                        JSONObject json = new JSONObject();
+                        json.put("imageBase64", imageBase64);
+                        json.put("wsqBase64", wsqBase64);
+
+                        String message = json.toString();
+
+                        Log.i(TAG,"message: "+message);
+                        guardarWSQ(wsqBase64);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+
+                        Log.i(TAG, "RESULT OF SCAN STATUS - FAILED: "+ e);
+                    }
+
+
+                }else{
+                    Log.i(TAG, "RESULT OF SCAN STATUS - FAILED from capture method");
+
+                }
 
                 break;
         }
     }
+
     protected void CheckDevice() {
         try {
             eikon_reader.Open(Reader.Priority.EXCLUSIVE);
