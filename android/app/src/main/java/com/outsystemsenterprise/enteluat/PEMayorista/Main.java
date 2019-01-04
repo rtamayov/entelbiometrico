@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -66,11 +67,14 @@ public class Main extends Activity {
         btnEikon = (Button) findViewById(R.id.btnEikon);
         tvReceivedMsg = (TextView) findViewById(R.id.tvReceivedMsg);
 
-        //se desactiva eikon mientras no se integre sdk
         btnEikon.setEnabled(false);
         btnMorpho.setEnabled(false);
 
-        requerirPermisos();
+        if(Build.VERSION.SDK_INT > 22){
+            requerirPermisos();
+        }else{
+            btnMorpho.setEnabled(true);
+        }
 
         tvReceivedMsg.setText(validarExtra());
 
