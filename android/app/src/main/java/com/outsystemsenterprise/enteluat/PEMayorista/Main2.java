@@ -50,8 +50,7 @@ public class Main2 extends Activity {
     private String eikon_device_name = "";
     private String scan_request_code = "";
     private Reader eikon_reader;
-    private Button btnMorpho;
-    private Button btnEikon;
+    private Button btnScan ;
     private TextView tvReceivedMsg;
     private String directorioWSQ_PATH;
 
@@ -60,32 +59,20 @@ public class Main2 extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btnMorpho = (Button) findViewById(R.id.btnMorpho);
-        btnEikon = (Button) findViewById(R.id.btnEikon);
+        btnScan = (Button) findViewById(R.id.btnScan);
+
         tvReceivedMsg = (TextView) findViewById(R.id.tvReceivedMsg);
 
+        btnScan.setEnabled(false);
+
         //se desactiva eikon mientras no se integre sdk
-        btnEikon.setEnabled(false);
-        btnMorpho.setEnabled(false);
+        btnScan.setEnabled(false);
 
         requerirPermisos();
 
         tvReceivedMsg.setText(validarExtra());
 
-        btnEikon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(ContextCompat.checkSelfPermission(Main2.this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-                    initializeEikon();
-                }else{
-                    requerirPermisos();
-                }
-
-            }
-        });
-
-        btnMorpho.setOnClickListener(new View.OnClickListener() {
+        btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(ContextCompat.checkSelfPermission(Main2.this,
@@ -173,7 +160,7 @@ public class Main2 extends Activity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode == STORAGE_PERMISSION_CODE){
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                btnMorpho.setEnabled(true);
+                btnScan.setEnabled(true);
                 crearDirectorios();
             } else {
                 showToast("No se otorgaron Permisos");
@@ -199,6 +186,7 @@ public class Main2 extends Activity {
 
             @Override
             public void onError(ZyResponse obj) {
+
                 showToast(obj.deError);
             }
         });

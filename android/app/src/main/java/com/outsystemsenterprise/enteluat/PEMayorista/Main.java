@@ -49,14 +49,14 @@ public class Main extends Activity {
     private static final String ACTION_USB_PERMISSION = "com.digitalpersona.uareu.dpfpddusbhost.USB_PERMISSION";
     private static final int FIRST_CHECK = 1;
     private static final int SECOND_SCAN = 2;
+    private int scan_step = 0;
     private int EIKON_STEP = 0;
     private int STORAGE_PERMISSION_CODE = 1;
     private String eikon_serial_number = "";
     private String eikon_device_name = "";
     private String scan_request_code = "";
     private Reader eikon_reader;
-    private Button btnMorpho;
-    private Button btnEikon;
+    private Button btnScan;
     private TextView tvReceivedMsg;
     private String directorioWSQ_PATH;
 
@@ -65,47 +65,41 @@ public class Main extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btnMorpho = (Button) findViewById(R.id.btnMorpho);
-        btnEikon = (Button) findViewById(R.id.btnEikon);
+        btnScan = (Button) findViewById(R.id.btnScan);
+
         tvReceivedMsg = (TextView) findViewById(R.id.tvReceivedMsg);
 
-        btnEikon.setEnabled(false);
-        btnMorpho.setEnabled(false);
+        btnScan.setEnabled(false);
 
         if(Build.VERSION.SDK_INT > 22){
             requerirPermisos();
         }else{
-            btnMorpho.setEnabled(true);
+            btnScan.setEnabled(true);
         }
 
         tvReceivedMsg.setText(validarExtra());
 
-        btnEikon.setOnClickListener(new View.OnClickListener() {
+        btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(ContextCompat.checkSelfPermission(Main.this,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-                    initializeEikon();
+                    initializeScan();
                 }else{
                     requerirPermisos();
                 }
-
             }
         });
+    }
 
-        btnMorpho.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(ContextCompat.checkSelfPermission(Main.this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-                    initializeMorpho();
-                }else{
-                    requerirPermisos();
-                }
-
-            }
-        });
-
+    private void initializeScan() {
+        switch (scan_step){
+            case 0:
+                initializeMorpho();
+                break;
+            case 1:
+                initializeEikon();
+        }
     }
 
     private String getTimestampString() {
@@ -126,8 +120,8 @@ public class Main extends Activity {
         }
         if(!directorio.exists()){
             Log.i(TAG,"crearDirectorio:exists: "+ directorio.exists());
-            boolean patito = directorio.mkdir();
-            Log.i(TAG,"crearDirectorio:dircreated?: "+ patito);
+            boolean checkDir = directorio.mkdir();
+            Log.i(TAG,"crearDirectorio:dircreated?: "+ checkDir);
         }
         directorioWSQ_PATH = directorio.getAbsolutePath();
         Log.i(TAG,"crearDirectorio:end ret: " + directorioWSQ_PATH);
@@ -175,8 +169,7 @@ public class Main extends Activity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode == STORAGE_PERMISSION_CODE){
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                btnMorpho.setEnabled(true);
-                btnEikon.setEnabled(true);
+                btnScan.setEnabled(true);
                 crearDirectorios();
             } else {
                 showToast("No se otorgaron Permisos");
@@ -194,13 +187,16 @@ public class Main extends Activity {
 
             @Override
             public void onSuccess(ZyResponse zyResponse)  {
-                //showToast(zyResponse.sensorName+"\n"+zyResponse.productDescriptor);
                 showToast("Huella Obtenida\nCreando Archivo");
                 guardarWSQ(formatToBase64(zyResponse.wsq));
             }
 
             @Override
             public void onError(ZyResponse obj) {
+                if(obj.deError.contains("19005")){
+                    scan_step = 1;
+                    initializeEikon();
+                }
                 showToast(obj.deError);
             }
         });
@@ -313,6 +309,7 @@ public class Main extends Activity {
                             if(DPFPDDUsbHost.DPFPDDUsbCheckAndRequestPermissions(this.getApplicationContext(),mPermissionIntent,eikon_device_name)){
                                 CheckDevice();
                                 EIKON_STEP = 1;
+                                btnScan.setText("Start Scan");
                             }
                         }
                     } catch (UareUException e){
@@ -346,6 +343,9 @@ public class Main extends Activity {
 
                         Log.i(TAG,"message: "+message);
                         guardarWSQ(wsqBase64);
+                        scan_step = 0;
+                        EIKON_STEP = 0;
+                        btnScan.setText("Scan");
                     }
                     catch (Exception e) {
                         e.printStackTrace();

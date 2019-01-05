@@ -14,7 +14,8 @@
 
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:text="Coloque el dedo..." />
+        android:text="Coloque el dedo sobre el lector"
+        android:textSize="24sp" />
 
     <ImageView
         android:id="@+id/bitmap_image"

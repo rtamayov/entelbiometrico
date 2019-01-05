@@ -110,6 +110,7 @@ public class EikonActivity extends AppCompatActivity {
     private void capture(){
         // initiliaze dp sdk
             try {
+                Log.i(LOG_TAG,eikon_serial_number);
                 Context applContext = getApplicationContext();
                 m_reader = Globals.getInstance().getReader(eikon_serial_number, applContext);
                 m_reader.Open(Reader.Priority.EXCLUSIVE);
@@ -262,16 +263,8 @@ public class EikonActivity extends AppCompatActivity {
                         }
 
                     }
-
-
-
-
-
-
-
                 }
             }).start();
-
         }
 
         private void compressImage() {
@@ -303,6 +296,12 @@ public class EikonActivity extends AppCompatActivity {
                 i.putExtra("imageBase64", imageBase64);
                 i.putExtra("wsqBase64", wsqBase64);
 
+                try {
+                    m_reader.Close();
+                } catch (UareUException e) {
+                    e.printStackTrace();
+                }
+
                 setResult(Activity.RESULT_OK, i);
                 finish();
 
@@ -315,10 +314,6 @@ public class EikonActivity extends AppCompatActivity {
 
             }
         }
-
-
-
-
 
         @Override
         public void onBackPressed() {
@@ -339,27 +334,6 @@ public class EikonActivity extends AppCompatActivity {
             setResult(Activity.RESULT_CANCELED, i);
             finish();
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         private String encode(byte[] d) {
             if (d == null) {

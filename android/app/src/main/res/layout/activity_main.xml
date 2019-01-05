@@ -12,26 +12,21 @@
         android:layout_width="wrap_content"
         android:layout_height="102dp"
         android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="32dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="30dp"
         android:src="@drawable/logoapp" />
 
     <Button
-        android:id="@+id/btnMorpho"
+        android:id="@+id/btnScan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="201dp"
-        android:text="MorphoSmart MSO 1300"
-        android:textColor="#FFFFFF" />
-
-    <Button
-        android:id="@+id/btnEikon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Eikon Touch 710"
+        android:layout_marginTop="224dp"
+        android:text="Scan"
         android:textColor="#FFFFFF" />
 
     <TextView
