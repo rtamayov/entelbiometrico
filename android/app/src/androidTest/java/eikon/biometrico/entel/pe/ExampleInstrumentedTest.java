@@ -1,4 +1,4 @@
-package cl.entel.cardiles.lowcompreader;
+package eikon.biometrico.entel.pe;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,7 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.entel.cardiles.lowcompreader", appContext.getPackageName());
+        assertEquals("eikon.biometrico.entel.pe", appContext.getPackageName());
     }
 }
-//test
