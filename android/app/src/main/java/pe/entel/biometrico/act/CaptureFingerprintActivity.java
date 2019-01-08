@@ -86,7 +86,23 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
         {
             public void onClick(View v)
             {
-                onBackPressed ();
+                //onBackPressed ();
+
+                try{
+
+                    if(cap_result == null){
+                        onBackPressed ();
+                    }else{
+                        returnByteArray();
+                    }
+
+                }catch (Exception e){
+
+                    Toast.makeText(getApplicationContext(),
+                            "Try Again", Toast.LENGTH_SHORT).show();
+
+                }
+
             }
         });
 
@@ -278,7 +294,8 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
                             m_text_conclusionString = Globals.QualityToString(cap_result);
                             m_text_conclusionString += " (NFIQ score: " + nfiqScore + ")";
 
-                            returnByteArray();
+                            //Returns first image captured-
+                            //returnByteArray();
                         }
                         else{
                             m_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.black);
@@ -426,7 +443,8 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
     {
         m_imgView.setImageBitmap(m_bitmap);
         m_imgView.invalidate();
-        m_text_conclusion.setText(m_text_conclusionString);
+        //m_text_conclusion.setText(m_text_conclusionString);
+        Log.i("CaptureFingerprintAct", m_text_conclusionString);
     }
 
     @Override
