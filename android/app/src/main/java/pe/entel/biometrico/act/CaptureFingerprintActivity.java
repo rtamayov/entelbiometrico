@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import android.content.Context;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -269,6 +271,9 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
                             // update ui string
                             m_text_conclusionString = Globals.QualityToString(cap_result);
                             m_text_conclusionString += " (NFIQ score: " + nfiqScore + ")";
+
+                            returnByteArray(cap_result.image.getViews()[0].getImageData());
+
                         }
                         else{
                             m_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.black);
@@ -298,6 +303,21 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
         }).start();
     }
 
+    private void returnByteArray(byte[] wsq) {
+        Intent i = new Intent();
+        //Log.i(LOG_TAG,"wsqBase64: "+wsqBase64);
+        i.putExtra("wsqBase64", wsq);
+
+        try {
+            m_reader.Close();
+        } catch (UareUException e) {
+            e.printStackTrace();
+        }
+
+        setResult(Activity.RESULT_OK, i);
+        finish();
+    }
+
     public void UpdateGUI()
     {
         m_imgView.setImageBitmap(m_bitmap);
@@ -311,7 +331,9 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
         try
         {
             m_reset = true;
-            try {m_reader.CancelCapture(); } catch (Exception e) {}
+            try {m_reader.CancelCapture(); } catch (Exception e) {
+
+            }
             m_reader.Close();
 
         }

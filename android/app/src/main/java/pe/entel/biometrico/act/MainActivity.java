@@ -148,11 +148,11 @@ public class MainActivity extends Activity
     }
 
     protected void launchGetReader()
-    {
-        Intent i = new Intent(MainActivity.this, GetReaderActivity.class);
-        i.putExtra("device_name", m_deviceName);
-        startActivityForResult(i, 1);
-    }
+{
+    Intent i = new Intent(MainActivity.this, GetReaderActivity.class);
+    i.putExtra("device_name", m_deviceName);
+    startActivityForResult(i, 1);
+}
 
     protected void launchGetCapabilities()
     {
