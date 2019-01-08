@@ -194,12 +194,12 @@ public class ScanActionActivity extends Activity {
                 if(resultCode == Activity.RESULT_OK){
                     Log.i(TAG, "RESULT OF SCAN STATUS - OK");
 
-                    byte[] wsqBase64 = data.getByteArrayExtra("wsqBase64");
+                    String wsqBase64 = data.getStringExtra("wsqBase64");
 
                     Log.i(TAG,"wsqBase64: "+wsqBase64);
 
                     try {
-                        SaveWSQ(formatToBase64(wsqBase64));
+                        SaveWSQ(wsqBase64);
                         eikon_step = 0;
 
                         Toast.makeText(getApplicationContext(), "File Saved",
