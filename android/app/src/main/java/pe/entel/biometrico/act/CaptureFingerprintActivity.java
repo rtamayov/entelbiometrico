@@ -1,10 +1,12 @@
 package pe.entel.biometrico.act;
 
+import com.digitalpersona.uareu.Compression;
 import com.digitalpersona.uareu.Fid;
 import com.digitalpersona.uareu.Quality;
 import com.digitalpersona.uareu.Reader;
 import com.digitalpersona.uareu.Reader.Priority;
 import com.digitalpersona.uareu.UareUException;
+import com.digitalpersona.uareu.dpfj.CompressionImpl;
 import com.digitalpersona.uareu.jni.DpfjQuality;
 
 import android.app.Activity;
@@ -12,6 +14,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,15 +30,18 @@ import android.content.Context;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import biometrico.entel.pe.R;
 import pe.entel.biometrico.util.Globals;
+import pe.entel.biometrico.util.Utils;
 
 public class CaptureFingerprintActivity extends Activity implements OnItemSelectedListener
 {
+    private final static String LOG_TAG = "Capture";
     private Button m_back;
     private String m_deviceName = "";
 
@@ -272,8 +278,7 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
                             m_text_conclusionString = Globals.QualityToString(cap_result);
                             m_text_conclusionString += " (NFIQ score: " + nfiqScore + ")";
 
-                            returnByteArray(cap_result.image.getViews()[0].getImageData());
-
+                            returnByteArray();
                         }
                         else{
                             m_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.black);
@@ -303,20 +308,119 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
         }).start();
     }
 
-    private void returnByteArray(byte[] wsq) {
-        Intent i = new Intent();
-        //Log.i(LOG_TAG,"wsqBase64: "+wsqBase64);
-        i.putExtra("wsqBase64", wsq);
+    private void returnByteArray() {
 
-        try {
-            m_reader.Close();
-        } catch (UareUException e) {
-            e.printStackTrace();
+        //WSQ IN B64
+        //grab capture result and convert it into wsq as bytearray
+        Fid ISOFid = cap_result.image;
+        byte[] wsqRawCompress = processImage(ISOFid.getViews()[0].getData(),ISOFid.getViews()[0].getWidth(), ISOFid.getViews()[0].getHeight());
+        String wsqBase64 = Utils.formatWsqToBase64(wsqRawCompress);
+
+        if(wsqBase64 != null){
+
+            Intent i = new Intent();
+            Log.i(LOG_TAG,"wsqBase64: "+wsqBase64);
+            i.putExtra("wsqBase64", wsqBase64);
+
+            try {
+                m_reader.Close();
+            } catch (UareUException e) {
+                e.printStackTrace();
+            }
+
+            setResult(Activity.RESULT_OK, i);
+            finish();
+
+        }else{
+
+            Intent i = new Intent();
+            i.putExtra("message", "Image conversion failed");
+            setResult(Activity.RESULT_CANCELED, i);
+            finish();
+
+        }
+    }
+
+    public byte[] processImage(byte[] img, int width, int height) {
+
+        Bitmap bmWSQ = null;
+        bmWSQ = getBitmapAlpha8FromRaw(img, width, height);
+
+        byte[] arrayT = null;
+
+        Bitmap redimWSQ = overlay(bmWSQ);
+        int numOfbytes = redimWSQ.getByteCount();
+        ByteBuffer buffer = ByteBuffer.allocate(numOfbytes);
+        redimWSQ.copyPixelsToBuffer(buffer);
+        arrayT = buffer.array();
+
+        int v1 = 1;
+        for (int i = 0; i < arrayT.length; i++) {
+            if (i < 40448) { // 79
+                arrayT[i] = (byte) 255;
+            } else if (i >= 40448 && i <= 221696) {
+
+                if (v1 < 132) {
+                    arrayT[i] = (byte) 255;
+                } else if (v1 > 382) {
+                    arrayT[i] = (byte) 255;
+                }
+                if (v1 == 512) {
+                    v1 = 0;
+                }
+                v1++;
+            } else if (i > 221696) { // 433
+                arrayT[i] = (byte) 255;
+            }
+
         }
 
-        setResult(Activity.RESULT_OK, i);
-        finish();
+        CompressionImpl comp = new CompressionImpl();
+        try {
+            comp.Start();
+            comp.SetWsqBitrate(500, 0);
+
+            byte[] rawCompress = comp.CompressRaw(arrayT, redimWSQ.getWidth(), redimWSQ.getHeight(), 500, 8,
+                    Compression.CompressionAlgorithm.COMPRESSION_WSQ_NIST);
+
+            comp.Finish();
+            Log.i("Util", "getting WSQ...");
+            return rawCompress;
+
+        } catch (UareUException e) {
+            Log.e("Util", "UareUException..." + e);
+            return null;
+        } catch (Exception e) {
+            Log.e("Util", "Exception..." + e);
+            return null;
+        }
+
+
+
     }
+
+    private Bitmap overlay(Bitmap bmp) {
+        Bitmap bmOverlay = Bitmap.createBitmap(512, 512, Bitmap.Config.ALPHA_8);
+        Canvas canvas = new Canvas(bmOverlay);
+        canvas.drawBitmap(bmp, 512 / 2 - bmp.getWidth() / 2, 512 / 2 - bmp.getHeight() / 2, null);
+        canvas.save();
+        return bmOverlay;
+    }
+
+    private Bitmap getBitmapAlpha8FromRaw(byte[] Src, int width, int height) {
+        byte [] Bits = new byte[Src.length];
+        int i = 0;
+        for(i=0;i<Src.length;i++)
+        {
+            Bits[i] = Src[i];
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ALPHA_8);
+        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(Bits));
+
+        return bitmap;
+    }
+
 
     public void UpdateGUI()
     {
