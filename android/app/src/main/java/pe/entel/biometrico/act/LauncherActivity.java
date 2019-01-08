@@ -1,5 +1,6 @@
 package pe.entel.biometrico.act;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -9,6 +10,9 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -48,6 +52,26 @@ public class LauncherActivity extends Activity {
     private int eikon_step = 0;
     Reader m_reader;
 
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -75,6 +99,7 @@ public class LauncherActivity extends Activity {
             }
         });
 
+        verifyStoragePermissions(this);
     }
 
     private void initializeEikon(){
@@ -116,7 +141,6 @@ public class LauncherActivity extends Activity {
         });
         ZyRequest zyRequest = new ZyRequest();
         iBioCapture.capturar(zyRequest);
-
     }
 
     @Override
@@ -197,6 +221,11 @@ public class LauncherActivity extends Activity {
                 break;
         }
     }
+
+
+
+
+
 
     private void saveWSQ(String response){
         Log.i(TAG,"saveWSQ:init");
