@@ -1,4 +1,4 @@
-package pe.entel.biometrico;
+package pe.entel.biometrico.act;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -79,8 +79,6 @@ public class LauncherActivity extends Activity {
         ZyRequest zyRequest = new ZyRequest();
         iBioCapture.capturar(zyRequest);
 
-        Toast.makeText(this.getApplicationContext(), "Initialized",
-                Toast.LENGTH_SHORT).show();
     }
 
     private void saveWSQ(String response){

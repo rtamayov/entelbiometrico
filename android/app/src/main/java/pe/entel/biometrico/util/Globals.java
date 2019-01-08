@@ -5,7 +5,7 @@
  * copyright (c) 2013 DigitalPersona Inc.
  */
 
-package pe.entel.biometrico;
+package pe.entel.biometrico.util;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;

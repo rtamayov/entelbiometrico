@@ -1,6 +1,7 @@
-package pe.entel.biometrico;
+package pe.entel.biometrico.act;
 
 import biometrico.entel.pe.R;
+import pe.entel.biometrico.util.Globals;
 
 import com.digitalpersona.uareu.*;
 import com.digitalpersona.uareu.Reader.Priority;
@@ -8,7 +9,6 @@ import com.digitalpersona.uareu.Reader.Priority;
 import com.digitalpersona.uareu.dpfpddusbhost.DPFPDDUsbHost;
 import com.digitalpersona.uareu.dpfpddusbhost.DPFPDDUsbException;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
