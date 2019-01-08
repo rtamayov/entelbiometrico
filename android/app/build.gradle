@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.outsystemsenterprise.entel.PEMayorista"
+        applicationId "com.outsystemsenterprise.entelpp.PEMayorista"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
