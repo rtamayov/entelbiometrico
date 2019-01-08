@@ -1,4 +1,4 @@
-package pe.entel.biometrico;
+package pe.entel.biometrico.act;
 
 import com.digitalpersona.uareu.Fid;
 import com.digitalpersona.uareu.Quality;
@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import biometrico.entel.pe.R;
+import pe.entel.biometrico.util.Globals;
 
 public class CaptureFingerprintActivity extends Activity implements OnItemSelectedListener
 {

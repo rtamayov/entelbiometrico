@@ -1,4 +1,4 @@
-package pe.entel.biometrico;
+package pe.entel.biometrico.act;
 
 import com.digitalpersona.uareu.Reader;
 import com.digitalpersona.uareu.ReaderCollection;
@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.content.Context;
 
 import biometrico.entel.pe.R;
+import pe.entel.biometrico.util.Globals;
 
 public class GetReaderActivity extends Activity
 {
