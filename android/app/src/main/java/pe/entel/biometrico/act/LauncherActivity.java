@@ -49,9 +49,6 @@ public class LauncherActivity extends Activity {
 
     }
 
-
-
-
     private void initializeMorpho() {
         IBioCapture iBioCapture = new BioCapture(this, new IBioCapture.ICallback() {
             @Override
