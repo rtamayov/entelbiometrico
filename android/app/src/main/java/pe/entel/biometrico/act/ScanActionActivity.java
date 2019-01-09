@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 
 import biometrico.entel.pe.R;
 import pe.entel.biometrico.util.Globals;
+import pe.entel.biometrico.util.Utils;
 
 public class ScanActionActivity extends Activity {
 
@@ -280,7 +281,10 @@ public class ScanActionActivity extends Activity {
             String nombre = instructions
                     + ".txt";
 
-            String strFolder = Environment.getExternalStorageDirectory() +"/Android/data/com.outsystemsenterprise.enteldev.PEMayorista/files/entelWSQ/";
+            String strFolder = Environment.getExternalStorageDirectory() + Utils.rutaArchivo();
+
+
+
 
             File folder = new File(strFolder);
             boolean success = true;

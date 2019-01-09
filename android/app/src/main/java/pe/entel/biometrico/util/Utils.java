@@ -1,8 +1,10 @@
 package pe.entel.biometrico.util;
 
+import biometrico.entel.pe.BuildConfig;
+
 public class Utils {
 
-    public static String formatWsqToBase64(byte[] wsq){
+    public static String formatWsqToBase64(byte[] wsq) {
         if (wsq == null) {
             return null;
         }
@@ -37,5 +39,19 @@ public class Utils {
             dest[idx] = (byte) 61;
         }
         return new String(dest);
+    }
+
+    public static String rutaArchivo() {
+        String respuesta = "/Android/data/com.outsystemsenterprise.entel.PEMayorista/files/entelWSQ/";
+
+        if (BuildConfig.FLAVOR.equals("dev")) {
+            respuesta = "/Android/data/com.outsystemsenterprise.enteldev.PEMayorista/files/entelWSQ/";
+        } else if (BuildConfig.FLAVOR.equals("tst")) {
+            respuesta = "/Android/data/com.outsystemsenterprise.enteltst.PEMayorista/files/entelWSQ/";
+        }else if (BuildConfig.FLAVOR.equals("pp")) {
+            respuesta = "/Android/data/com.outsystemsenterprise.entelpp.PEMayorista/files/entelWSQ/";
+        }
+
+        return respuesta;
     }
 }

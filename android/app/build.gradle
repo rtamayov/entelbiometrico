@@ -21,6 +21,23 @@ android {
     dependencies {
         implementation fileTree(dir: 'libs', include: ['*.aar'])
     }
+
+    flavorDimensions "ruta"
+
+    productFlavors {
+        dev {
+            dimension "ruta"
+        }
+        tst {
+            dimension "ruta"
+        }
+        pp {
+            dimension "ruta"
+        }
+        prod {
+            dimension "ruta"
+        }
+    }
 }
 
 dependencies {

@@ -38,6 +38,7 @@ import java.io.IOException;
 
 import biometrico.entel.pe.R;
 import pe.entel.biometrico.util.Globals;
+import pe.entel.biometrico.util.Utils;
 
 public class LauncherActivity extends Activity {
 
@@ -77,6 +78,12 @@ public class LauncherActivity extends Activity {
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+       /* Toast.makeText(getApplicationContext(), Utils.rutaArchivo(),
+                Toast.LENGTH_SHORT).show();*/
+
+
+
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
