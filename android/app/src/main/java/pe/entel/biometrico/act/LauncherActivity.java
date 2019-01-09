@@ -106,6 +106,7 @@ public class LauncherActivity extends Activity {
         if(eikon_step == 0){
             Intent i = new Intent(LauncherActivity.this, GetReaderActivity.class);
             i.putExtra("device_name", m_deviceName);
+            i.putExtra("parent_activity", "ScanActionActivity");
             startActivityForResult(i, eikon_step);
         } else if (eikon_step == 1){
             Intent i = new Intent(LauncherActivity.this, CaptureFingerprintActivity.class);

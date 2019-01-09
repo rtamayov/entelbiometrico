@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -23,8 +24,11 @@ import pe.entel.biometrico.util.Globals;
 
 public class GetReaderActivity extends Activity
 {
+    private final String TAG = "GetReaderActivity";
+
     private Button m_back;
     private String m_deviceName = "";
+    private String parent_activity;
 
     private ListView m_readers;
     private ReaderCollection readers;
@@ -34,69 +38,85 @@ public class GetReaderActivity extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_get_list);
 
-        m_back = (Button) findViewById(R.id.back);
-        m_deviceName = getIntent().getExtras().getString("device_name");
-        m_back.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
+        parent_activity = getIntent().getExtras().getString("parent_activity");
+
+        if (parent_activity == null) {
+            Log.i(TAG,"GetReaderActivity called without parent activity");
+            finish();
+        }else{
+
+            setContentView(R.layout.activity_get_list);
+
+            m_deviceName = getIntent().getExtras().getString("device_name");
+            m_back = (Button) findViewById(R.id.back);
+            m_back.setOnClickListener(new View.OnClickListener()
+            {
+                public void onClick(View v)
+                {
+                    onBackPressed();
+                }
+            });
+
+            Log.i(TAG,"device name: " + m_deviceName);
+
+            // initialize dp sdk
+            try
+            {
+                Context applContext = getApplicationContext();
+                readers = Globals.getInstance().getReaders(applContext);
+
+                Log.i(TAG,"GetReaders");
+            } catch (UareUException e)
             {
                 onBackPressed();
             }
-        });
 
-        // initialize dp sdk
-        try
-        {
-            Context applContext = getApplicationContext();
-            readers = Globals.getInstance().getReaders(applContext);
-        } catch (UareUException e)
-        {
-            onBackPressed();
-        }
-
-        int nSize = readers.size();
-        if (nSize > 1)
-        {
-            String[] values = null;
-            values = new String[nSize];
-            for (int nCount = 0; nCount < nSize; nCount++)
+            int nSize = readers.size();
+            if (nSize > 1)
             {
-                values[nCount] = readers.get(nCount).GetDescription().name;
-            }
-
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, android.R.id.text1, values);
-            m_readers = (ListView) findViewById(R.id.list);
-            m_readers.setAdapter(adapter);
-            m_readers.setOnItemClickListener(new OnItemClickListener()
-            {
-                public void onItemClick(AdapterView<?> parent, View view,int position, long id)
+                String[] values = null;
+                values = new String[nSize];
+                for (int nCount = 0; nCount < nSize; nCount++)
                 {
-                    Intent i = new Intent();
-                    i.putExtra("device_name", readers.get(position).GetDescription().name);
-                    setResult(Activity.RESULT_OK, i);
-
-                    InitDevice(position);
-
-                    finish();
+                    values[nCount] = readers.get(nCount).GetDescription().name;
                 }
-            });
-        }
-        else
-        {
-            Intent i = new Intent();
-            i.putExtra("device_name", (nSize == 0 ? "" : readers.get(0).GetDescription().name));
 
-            if (getIntent() != null &&
-                    getIntent().getAction() != null &&
-                    getIntent().getAction().equals(UsbManager.ACTION_USB_DEVICE_ATTACHED))
-            {
-                InitDevice(0);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, android.R.id.text1, values);
+                m_readers = (ListView) findViewById(R.id.list);
+                m_readers.setAdapter(adapter);
+                m_readers.setOnItemClickListener(new OnItemClickListener()
+                {
+                    public void onItemClick(AdapterView<?> parent, View view,int position, long id)
+                    {
+                        Intent i = new Intent();
+                        i.putExtra("device_name", readers.get(position).GetDescription().name);
+                        setResult(Activity.RESULT_OK, i);
+
+                        InitDevice(position);
+
+                        finish();
+                    }
+                });
             }
-            setResult(Activity.RESULT_OK, i);
-            finish();
+            else
+            {
+                Intent i = new Intent();
+                i.putExtra("device_name", (nSize == 0 ? "" : readers.get(0).GetDescription().name));
+
+                if (getIntent() != null &&
+                        getIntent().getAction() != null &&
+                        getIntent().getAction().equals(UsbManager.ACTION_USB_DEVICE_ATTACHED))
+                {
+                    InitDevice(0);
+                }
+                setResult(Activity.RESULT_OK, i);
+
+                finish();
+            }
+
         }
+
     }
 
     private void InitDevice(int position) {

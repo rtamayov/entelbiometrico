@@ -114,12 +114,12 @@ public class ScanActionActivity extends Activity {
     }
 
 
-
     private void initializeEikon() {
 
         if(eikon_step == 0){
             Intent i = new Intent(ScanActionActivity.this, GetReaderActivity.class);
             i.putExtra("device_name", m_deviceName);
+            i.putExtra("parent_activity", "ScanActionActivity");
             startActivityForResult(i, eikon_step);
         } else if (eikon_step == 1){
             Intent i = new Intent(ScanActionActivity.this, CaptureFingerprintActivity.class);
@@ -298,6 +298,7 @@ public class ScanActionActivity extends Activity {
         public void onReceive(Context context, Intent intent)
         {
             String action = intent.getAction();
+
             if (ACTION_USB_PERMISSION.equals(action))
             {
                 synchronized (this)
