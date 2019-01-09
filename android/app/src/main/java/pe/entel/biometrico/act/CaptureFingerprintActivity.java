@@ -90,10 +90,18 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
 
                 try{
 
-                    if(cap_result == null){
-                        onBackPressed ();
+                    if(cap_result != null){
+                        if(cap_result.image == null){
+                            Log.i(LOG_TAG, "Image is null");
+                            onBackPressed ();
+                        }else{
+                            Log.i(LOG_TAG, "Returning image");
+                            returnByteArray();
+                        }
                     }else{
-                        returnByteArray();
+                        Log.i(LOG_TAG, "Capture result is null");
+                        Toast.makeText(getApplicationContext(),
+                                "No se ha capturado ninguna huella, intenta nuevamente", Toast.LENGTH_SHORT).show();
                     }
 
                 }catch (Exception e){
@@ -351,7 +359,7 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
         }else{
 
             Intent i = new Intent();
-            i.putExtra("message", "Image conversion failed");
+            i.putExtra(LOG_TAG, "Image conversion failed");
             setResult(Activity.RESULT_CANCELED, i);
             finish();
 
