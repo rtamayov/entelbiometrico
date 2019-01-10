@@ -54,8 +54,7 @@ public class ScanActionActivity extends Activity {
         setContentView(R.layout.activity_scan);
 
 
-
-        //verifyStoragePermissions(this);
+        Utils.verifyStoragePermissions(this);
 
 
 

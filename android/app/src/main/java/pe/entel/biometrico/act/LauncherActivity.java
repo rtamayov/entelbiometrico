@@ -55,25 +55,9 @@ public class LauncherActivity extends Activity {
     private int eikon_step = 0;
     Reader m_reader;
     private final int CONSMENCONFIGURACION = 1;
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
 
-    public static void verifyStoragePermissions(Activity activity) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
-            );
-        }
-    }
+
 
 
     @Override
@@ -108,7 +92,7 @@ public class LauncherActivity extends Activity {
             }
         });
 
-        verifyStoragePermissions(this);
+        Utils.verifyStoragePermissions(this);
     }
 
     private void initializeEikon(){
