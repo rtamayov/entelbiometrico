@@ -54,4 +54,20 @@ public class Utils {
 
         return respuesta;
     }
+
+    public static String cualBuild() {
+        String respuesta = "NIGUNO";
+
+        if (BuildConfig.FLAVOR.equals("dev")) {
+            respuesta = "DESARROLLO";
+        } else if (BuildConfig.FLAVOR.equals("tst")) {
+            respuesta = "TEST";
+        }else if (BuildConfig.FLAVOR.equals("pp")) {
+            respuesta = "PRE PRODUCCION";
+        }else if(BuildConfig.FLAVOR.equals("prod")) {
+            respuesta = "PRODUCCION";
+        }
+
+        return respuesta;
+    }
 }

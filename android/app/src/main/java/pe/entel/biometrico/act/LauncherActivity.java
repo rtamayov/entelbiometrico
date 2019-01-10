@@ -13,6 +13,8 @@ import android.util.Log;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -52,7 +54,7 @@ public class LauncherActivity extends Activity {
     private String m_deviceName = "";
     private int eikon_step = 0;
     Reader m_reader;
-
+    private final int CONSMENCONFIGURACION = 1;
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -318,4 +320,25 @@ public class LauncherActivity extends Activity {
             }
         }
     };
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(0, CONSMENCONFIGURACION, 0,
+               "Administración").setIcon(
+                R.drawable.ic_my_library_books);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case CONSMENCONFIGURACION:
+                Toast.makeText(this, Utils.cualBuild(), Toast.LENGTH_SHORT).show();
+                break;
+
+            default:
+                break;
+        }
+        return false;
+    }
 }
