@@ -124,6 +124,7 @@ public class ScanActionActivity extends Activity {
         } else if (eikon_step == 1){
             Intent i = new Intent(ScanActionActivity.this, CaptureFingerprintActivity.class);
             i.putExtra("device_name", m_deviceName);
+            i.putExtra("instructions", instructions);
             startActivityForResult(i, eikon_step);
         }
 
@@ -190,45 +191,20 @@ public class ScanActionActivity extends Activity {
                 break;
             case 1:
                 Log.i(TAG, "ON RESULT OF SCAN");
+                finish();
 
-                if(resultCode == Activity.RESULT_OK){
+                /*if(resultCode == Activity.RESULT_OK){
                     Log.i(TAG, "RESULT OF SCAN STATUS - OK");
-
-                    String wsqBase64 = data.getStringExtra("wsqBase64");
-
-                    Log.i(TAG,"wsqBase64: "+wsqBase64);
-                    if(wsqBase64 == null){
-
-                        //CaptureFingerprinyActivity put WsqBase64 in extras, but ScanActionActivity got it null
-                        Log.i(TAG, "WsqBase64 String is null");
-                        Toast.makeText(getApplicationContext(), "Ocurrió un error con la imagen, intente nuevamente",
-                                Toast.LENGTH_SHORT).show();
-                        finish();
-                    }else{
-
-                        try {
-                            SaveWSQ(wsqBase64);
-                            eikon_step = 0;
-
-                            Toast.makeText(getApplicationContext(), "Archivo Guardado",
-                                    Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
-                        catch (Exception e) {
-                            e.printStackTrace();
-                            Log.i(TAG, "Error saving file: "+ e);
-                            Toast.makeText(getApplicationContext(), "Ocurrió un error guardando el archivo",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-
+                    Toast.makeText(getApplicationContext(), "Archivo Guardado",
+                            Toast.LENGTH_SHORT).show();
+                    finish();
 
                 }else{
                     Log.i(TAG, "RESULT OF SCAN STATUS - FAILED from capture method");
-                    Toast.makeText(getApplicationContext(), "La imagen está vacía",
+                    Toast.makeText(getApplicationContext(), "Ocurrió un error guardando el archivo",
                             Toast.LENGTH_SHORT).show();
-                }
+                    finish();
+                }*/
                 break;
         }
     }

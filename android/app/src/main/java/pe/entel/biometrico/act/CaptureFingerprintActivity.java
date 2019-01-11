@@ -17,6 +17,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,6 +31,8 @@ import android.content.Context;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +59,8 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
     private String m_text_conclusionString;
     private Reader.CaptureResult cap_result = null;
 
+    private String instructions;
+
     private Spinner m_spinner = null;
     private HashMap<String,Reader.ImageProcessing> m_imgProcMap = null;
 
@@ -68,6 +73,7 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
         m_title.setText("Capture");
         m_selectedDevice = (TextView) findViewById(R.id.selected_device);
         m_deviceName = getIntent().getExtras().getString("device_name");
+        instructions = getIntent().getExtras().getString("instructions");
 
         m_selectedDevice.setText("Device: " + m_deviceName);
 
@@ -344,8 +350,9 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
         if(wsqBase64 != null){
 
             Intent i = new Intent();
+            i.putExtra("m_deviceName",m_deviceName);
             Log.i(LOG_TAG,"wsqBase64: "+wsqBase64);
-            i.putExtra("wsqBase64", wsqBase64);
+            //i.putExtra("wsqBase64", wsqBase64);
 
             try {
                 m_reader.Close();
@@ -353,13 +360,36 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
                 e.printStackTrace();
             }
 
-            setResult(Activity.RESULT_OK, i);
-            finish();
+
+            /****STORE FILE****/
+
+            try {
+                SaveWSQ(wsqBase64);
+                Log.i(LOG_TAG,"Saving Image");
+                Toast.makeText(getApplicationContext(), "Archivo Guardado",
+                        Toast.LENGTH_SHORT).show();
+                setResult(Activity.RESULT_OK, i);
+                finish();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                Log.i(LOG_TAG,"Ocurrió un error guardando el archivo ");
+                Toast.makeText(getApplicationContext(), "Ocurrió un error guardando el archivo",
+                        Toast.LENGTH_SHORT).show();
+
+                setResult(Activity.RESULT_CANCELED, i);
+                finish();
+            }
+
+            /****STORE FILE****/
+
+
 
         }else{
 
             Intent i = new Intent();
-            i.putExtra(LOG_TAG, "Image conversion failed");
+            i.putExtra("m_deviceName",m_deviceName);
+            Log.i(LOG_TAG,"Ocurrió un error guardando el archivo ");
             setResult(Activity.RESULT_CANCELED, i);
             finish();
 
@@ -486,5 +516,55 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
         setContentView(R.layout.activity_capture_stream);
         initializeActivity();
         populateSpinner();
+    }
+
+
+
+
+
+
+
+
+
+    //SAVE FILE
+
+    void SaveWSQ(String wsq){
+
+        try {
+
+            String nombre = instructions
+                    + ".txt";
+
+            String strFolder = Environment.getExternalStorageDirectory() + Utils.rutaArchivo();
+
+
+
+
+            File folder = new File(strFolder);
+            boolean success = true;
+            if (!folder.exists()) {
+                //Toast.makeText(MainActivity.this, "Directory Does Not Exist, Create It", Toast.LENGTH_SHORT).show();
+                success = folder.mkdir();
+            }
+
+
+            File file = new File(strFolder,
+                    nombre);
+
+            file.createNewFile();
+            FileOutputStream stream = new FileOutputStream(file);
+            try {
+
+                stream.write(wsq.getBytes());
+            } finally {
+                stream.close();
+            }
+
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        }
     }
 }
