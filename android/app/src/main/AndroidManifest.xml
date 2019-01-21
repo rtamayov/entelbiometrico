@@ -35,7 +35,7 @@
 
         <activity android:name=".ScanActionActivity">
             <intent-filter>
-                <action android:name="pe.entel.biowsq.intent.action.SCAN"/>
+                <action android:name="pe.entel.biometrico.intent.action.SCAN"/>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
