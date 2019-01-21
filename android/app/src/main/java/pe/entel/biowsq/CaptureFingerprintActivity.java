@@ -1,5 +1,6 @@
 package pe.entel.biowsq;
 
+import com.digitalpersona.uareu.Compression;
 import com.digitalpersona.uareu.Fid;
 import com.digitalpersona.uareu.Reader;
 import com.digitalpersona.uareu.Reader.Priority;
@@ -60,7 +61,7 @@ public class CaptureFingerprintActivity extends Activity {
         {
             public void onClick(View v)
             {
-                onBackPressed ();
+                terminarButton();
             }
         });
     }
@@ -149,31 +150,6 @@ public class CaptureFingerprintActivity extends Activity {
         }
 
 
-
-        /////////
-        try{
-
-            if(cap_result != null){
-                if(cap_result.image == null){
-                    Log.i(LOG_TAG, "Image is null");
-                    onBackPressed ();
-                }else{
-                    Log.i(LOG_TAG, "Storing File");
-                    storeFileAndReturn();
-                }
-            }else{
-                Log.i(LOG_TAG, "Capture result is null");
-                Toast.makeText(getApplicationContext(),
-                        "No se ha capturado ninguna huella, intenta nuevamente", Toast.LENGTH_SHORT).show();
-            }
-
-        }catch (Exception e){
-
-            Toast.makeText(getApplicationContext(),
-                    "Try Again", Toast.LENGTH_SHORT).show();
-
-        }
-        ////////
     }
 
     // called when orientation has changed to manually destroy and recreate activity
@@ -218,10 +194,16 @@ public class CaptureFingerprintActivity extends Activity {
                     Log.i(LOG_TAG,"Saving Image");
                     Toast.makeText(getApplicationContext(), "Archivo Guardado",
                             Toast.LENGTH_SHORT).show();
+                    setResult(Activity.RESULT_OK, i);
+                    finish();
+                }else{
+                    Toast.makeText(getApplicationContext(), "No route for file",
+                            Toast.LENGTH_SHORT).show();
+                    setResult(Activity.RESULT_OK, i);
+                    finish();
                 }
 
-                setResult(Activity.RESULT_OK, i);
-                finish();
+
             }
             catch (Exception e) {
                 e.printStackTrace();
@@ -248,6 +230,41 @@ public class CaptureFingerprintActivity extends Activity {
         }
 
     }
+
+
+
+
+    public void terminarButton(){
+
+        try{
+
+            if(cap_result != null){
+                if(cap_result.image == null){
+                    Log.i(LOG_TAG, "Image is null");
+                    onBackPressed ();
+                }else{
+                    Log.i(LOG_TAG, "Storing File");
+                    storeFileAndReturn();
+                }
+            }else{
+                Log.i(LOG_TAG, "Capture result is null");
+                Toast.makeText(getApplicationContext(),
+                        "No se ha capturado ninguna huella, intenta nuevamente", Toast.LENGTH_SHORT).show();
+            }
+
+        }catch (Exception e){
+
+            Toast.makeText(getApplicationContext(),
+                    "Try Again", Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
+
+
+
+
+
 
     //SAVE FILE
 
