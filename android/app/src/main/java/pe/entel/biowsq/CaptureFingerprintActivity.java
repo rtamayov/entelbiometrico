@@ -165,7 +165,6 @@ public class CaptureFingerprintActivity extends Activity {
 
     public void storeFileAndReturn(){
 
-
         //WSQ IN B64
         //grab capture result and convert it into wsq as bytearray
         Fid ISOFid = cap_result.image;
@@ -189,15 +188,15 @@ public class CaptureFingerprintActivity extends Activity {
             /****STORE FILE****/
 
             try {
-                if(instructions != ""){
+                if(instructions == "" || instructions.isEmpty() || instructions == null ){
+                    Toast.makeText(getApplicationContext(), "No hay ruta para guardar archivo",
+                            Toast.LENGTH_SHORT).show();
+                    setResult(Activity.RESULT_CANCELED, i);
+                    finish();
+                }else{
                     SaveWSQ(wsqBase64);
                     Log.i(LOG_TAG,"Saving Image");
                     Toast.makeText(getApplicationContext(), "Archivo Guardado",
-                            Toast.LENGTH_SHORT).show();
-                    setResult(Activity.RESULT_OK, i);
-                    finish();
-                }else{
-                    Toast.makeText(getApplicationContext(), "No route for file",
                             Toast.LENGTH_SHORT).show();
                     setResult(Activity.RESULT_OK, i);
                     finish();
@@ -223,7 +222,7 @@ public class CaptureFingerprintActivity extends Activity {
 
             Intent i = new Intent();
             i.putExtra("m_deviceName",m_deviceName);
-            Log.i(LOG_TAG,"Ocurrió un error guardando el archivo ");
+            Log.i(LOG_TAG,"Ocurrió un error al procesar la huella ");
             setResult(Activity.RESULT_CANCELED, i);
             finish();
 
@@ -303,6 +302,7 @@ public class CaptureFingerprintActivity extends Activity {
 
         } catch (Exception e) {
 
+            Toast.makeText(CaptureFingerprintActivity.this, "Error creating file!", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
 
         }

@@ -65,6 +65,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Utils.verifyStoragePermissions(this);
+
         m_getReader = (Button) findViewById(R.id.get_reader);
 
         // register handler for UI elements

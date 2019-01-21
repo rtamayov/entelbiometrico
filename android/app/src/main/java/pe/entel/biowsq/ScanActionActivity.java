@@ -22,6 +22,7 @@ import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.widget.Toast;
 
 public class ScanActionActivity extends Activity {
 
@@ -35,7 +36,6 @@ public class ScanActionActivity extends Activity {
 
     private static final String ACTION_USB_PERMISSION = "com.digitalpersona.uareu.dpfpddusbhost.USB_PERMISSION";
 
-    private Button m_getReader;
     private String m_deviceName = "";
 
     Reader m_reader;
@@ -60,7 +60,9 @@ public class ScanActionActivity extends Activity {
         System.setProperty("DPTRACE_ON", "1");
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_scan_action);
+
+        Utils.verifyStoragePermissions(this);
 
         //File Instructions
         Intent intent = getIntent();
@@ -68,17 +70,7 @@ public class ScanActionActivity extends Activity {
         instructions = instructions.substring(2, instructions.length()-2);
         Log.v(LOG_TAG, "Route: " +instructions);
 
-
-        m_getReader = (Button) findViewById(R.id.get_reader);
-
-        // register handler for UI elements
-        m_getReader.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                launchGetReader();
-            }
-        });
+        launchGetReader();
     }
 
 
@@ -168,8 +160,7 @@ public class ScanActionActivity extends Activity {
                         }
                     } catch (UareUException e1){
                         displayReaderNotFound();
-                    }
-                    catch (DPFPDDUsbException e){
+                    } catch (DPFPDDUsbException e){
                         displayReaderNotFound();
                     }
                 } else{
@@ -178,6 +169,14 @@ public class ScanActionActivity extends Activity {
                 break;
             case CAPTURE_FINGERPRINT_CODE:
                 Log.i(LOG_TAG,"ON CAPTURE RESULT");
+
+                if(resultCode == Activity.RESULT_OK){
+                    Log.i(LOG_TAG, "CAPTURE RESULT OK");
+                    finish();
+                }else{
+                    Log.i(LOG_TAG, "CAPTURE RESULT CANCELED");
+                    finish();
+                }
                 break;
         }
     }
@@ -186,16 +185,8 @@ public class ScanActionActivity extends Activity {
 
     private void displayReaderNotFound()
     {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle("Reader Not Found");
-        alertDialogBuilder.setMessage("Plug in a reader and try again.").setCancelable(false).setPositiveButton("Ok",
-                new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog,int id) {}
-                });
-
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
+        Toast.makeText(ScanActionActivity.this, "No se detectó el huellero", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver()
