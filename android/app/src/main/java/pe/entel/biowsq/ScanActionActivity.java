@@ -25,6 +25,8 @@ import android.hardware.usb.UsbManager;
 
 public class ScanActionActivity extends Activity {
 
+    private String instructions;
+
     private final String LOG_TAG = "ScanActionActivity";
 
     private final int GET_READER_CODE = 1;
@@ -60,6 +62,13 @@ public class ScanActionActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //File Instructions
+        Intent intent = getIntent();
+        instructions = intent.getStringExtra("file");
+        instructions = instructions.substring(2, instructions.length()-2);
+        Log.v(LOG_TAG, "Route: " +instructions);
+
+
         m_getReader = (Button) findViewById(R.id.get_reader);
 
         // register handler for UI elements
@@ -85,6 +94,7 @@ public class ScanActionActivity extends Activity {
     {
         Intent i = new Intent(ScanActionActivity.this,CaptureFingerprintActivity.class);
         i.putExtra("device_name", m_deviceName);
+        i.putExtra("instructions", instructions);
         startActivityForResult(i, CAPTURE_FINGERPRINT_CODE);
     }
     //Activity Launchers

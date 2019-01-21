@@ -86,6 +86,7 @@ public class MainActivity extends Activity {
     {
         Intent i = new Intent(MainActivity.this,CaptureFingerprintActivity.class);
         i.putExtra("device_name", m_deviceName);
+        i.putExtra("instructions", "");
         startActivityForResult(i, CAPTURE_FINGERPRINT_CODE);
     }
     //Activity Launchers
