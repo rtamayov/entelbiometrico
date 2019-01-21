@@ -23,10 +23,9 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 
+public class ScanActionActivity extends Activity {
 
-public class MainActivity extends Activity {
-
-    private final String LOG_TAG = "MainActivity";
+    private final String LOG_TAG = "ScanActionActivity";
 
     private final int GET_READER_CODE = 1;
     private final int CAPTURE_FINGERPRINT_CODE = 2;
@@ -77,14 +76,14 @@ public class MainActivity extends Activity {
     //Activity Launchers
     protected void launchGetReader()
     {
-        Intent i = new Intent(MainActivity.this, GetReaderActivity.class);
+        Intent i = new Intent(ScanActionActivity.this, GetReaderActivity.class);
         i.putExtra("device_name", m_deviceName);
         startActivityForResult(i, GET_READER_CODE);
     }
 
     protected void launchCaptureFingerprint()
     {
-        Intent i = new Intent(MainActivity.this,CaptureFingerprintActivity.class);
+        Intent i = new Intent(ScanActionActivity.this,CaptureFingerprintActivity.class);
         i.putExtra("device_name", m_deviceName);
         startActivityForResult(i, CAPTURE_FINGERPRINT_CODE);
     }
