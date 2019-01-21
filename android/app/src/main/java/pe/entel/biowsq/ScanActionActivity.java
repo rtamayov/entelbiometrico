@@ -91,28 +91,6 @@ public class ScanActionActivity extends Activity {
     }
     //Activity Launchers
 
-
-
-    protected void CheckDevice()
-    {
-        try
-        {
-            m_reader.Open(Priority.EXCLUSIVE);
-            Reader.Capabilities cap = m_reader.GetCapabilities();
-            //can capture
-            if(cap.can_capture){
-                Log.i("LOG_TAG","Device Can Capture!");
-            }
-            m_reader.Close();
-        }
-        catch (UareUException e1)
-        {
-            displayReaderNotFound();
-        }
-    }
-
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -148,6 +126,7 @@ public class ScanActionActivity extends Activity {
                                     Reader.Capabilities cap = m_reader.GetCapabilities();
                                     if(cap.can_capture){
                                         Log.i("LOG_TAG","Device Can Capture!");
+
                                         //CHAIN
                                         launchCaptureFingerprint();
                                     }
@@ -203,8 +182,9 @@ public class ScanActionActivity extends Activity {
                     {
                         if(device != null)
                         {
-                            //call method to set up device communication
-                            CheckDevice();
+                            //On first time permission asking, this should finish to prevent it being
+                            //stuck on scanActionActivity
+                            finish();
                         }
                     }
                 }
