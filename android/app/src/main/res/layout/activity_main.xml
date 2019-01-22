@@ -12,6 +12,15 @@
         android:orientation="vertical"
         android:padding="10dp" >
 
+        <TextView
+            android:id="@+id/login_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="no version"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#FFFFFF" />
+
         <ImageView
             android:layout_width="200dp"
             android:layout_height="100dp"

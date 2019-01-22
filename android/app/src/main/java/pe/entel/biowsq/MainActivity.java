@@ -24,6 +24,7 @@ import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -33,6 +34,8 @@ public class MainActivity extends Activity {
 
     private final int GET_READER_CODE = 1;
     private final int CAPTURE_FINGERPRINT_CODE = 2;
+
+    private TextView m_login_version;
 
 
     private static final String ACTION_USB_PERMISSION = "com.digitalpersona.uareu.dpfpddusbhost.USB_PERMISSION";
@@ -67,7 +70,11 @@ public class MainActivity extends Activity {
 
         Utils.verifyStoragePermissions(this);
 
+        m_login_version = (TextView) findViewById(R.id.login_version);
+
         m_getReader = (Button) findViewById(R.id.get_reader);
+
+        m_login_version.setText(Utils.fnVersion(this));
 
         // register handler for UI elements
         m_getReader.setOnClickListener(new View.OnClickListener()

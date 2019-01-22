@@ -2,12 +2,17 @@ package pe.entel.biowsq;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 
 import pe.entel.biowsq.BuildConfig;
 
 public class Utils {
+
+    private static final String LOG_TAG = "Utils";
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -94,5 +99,23 @@ public class Utils {
                     REQUEST_EXTERNAL_STORAGE
             );
         }
+    }
+
+
+    public static String fnVersion(Context poContext) {
+        String lsVersion = "";
+        PackageInfo loPackageInfo = null;
+        try {
+            loPackageInfo = poContext.getPackageManager().getPackageInfo(
+                    poContext.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            Log.v(LOG_TAG, "Verificar el manifest: " + e.getMessage());
+            return "ERROR VERSION";
+        }
+
+        lsVersion = loPackageInfo.versionName;
+
+        return lsVersion;
     }
 }
