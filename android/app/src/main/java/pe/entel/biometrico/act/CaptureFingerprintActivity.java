@@ -261,6 +261,7 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
         catch (Exception e)
         {
             Log.w("UareUSampleJava", "error during init of reader");
+            Utils.saveErrorInStorage("Error during initialization of reader");
             m_deviceName = "";
             onBackPressed();
             return;
@@ -331,6 +332,7 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
                     if(!m_reset)
                     {
                         Log.w("UareUSampleJava", "error during capture: " + e.toString());
+                        Utils.saveErrorInStorage("Error during capture: " + e.toString());
                         m_deviceName = "";
                         onBackPressed();
                     }
@@ -358,29 +360,39 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
                 m_reader.Close();
             } catch (UareUException e) {
                 e.printStackTrace();
+                Utils.saveErrorInStorage(e.toString());
             }
 
 
             /****STORE FILE****/
-
             try {
-                SaveWSQ(wsqBase64);
-                Log.i(LOG_TAG,"Saving Image");
-                Toast.makeText(getApplicationContext(), "Archivo Guardado",
-                        Toast.LENGTH_SHORT).show();
-                setResult(Activity.RESULT_OK, i);
-                finish();
+
+                if(instructions.isEmpty() || instructions == "" || instructions == null){
+
+                    Log.i(LOG_TAG,"Used from launcher - Not Saving Image");
+                    Toast.makeText(getApplicationContext(), "Correcto",
+                            Toast.LENGTH_SHORT).show();
+                    setResult(Activity.RESULT_OK, i);
+                    finish();
+
+                }else{
+                    SaveWSQ(wsqBase64);
+                    Log.i(LOG_TAG,"Saving Image");
+                    Toast.makeText(getApplicationContext(), "Archivo Guardado",
+                            Toast.LENGTH_SHORT).show();
+                    setResult(Activity.RESULT_OK, i);
+                    finish();
+                }
             }
             catch (Exception e) {
                 e.printStackTrace();
-                Log.i(LOG_TAG,"Ocurrió un error guardando el archivo ");
+                Log.e(LOG_TAG,"Ocurrió un error guardando el archivo ");
                 Toast.makeText(getApplicationContext(), "Ocurrió un error guardando el archivo",
                         Toast.LENGTH_SHORT).show();
 
                 setResult(Activity.RESULT_CANCELED, i);
                 finish();
             }
-
             /****STORE FILE****/
 
 
@@ -389,7 +401,8 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
 
             Intent i = new Intent();
             i.putExtra("m_deviceName",m_deviceName);
-            Log.i(LOG_TAG,"Ocurrió un error guardando el archivo ");
+            Log.i(LOG_TAG,"Ocurrió un error al transformar la huella");
+            Utils.saveErrorInStorage("Ocurrió un error al transformar la huella");
             setResult(Activity.RESULT_CANCELED, i);
             finish();
 
@@ -496,16 +509,23 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
             }
             m_reader.Close();
 
+            Intent i = new Intent();
+            i.putExtra("device_name", m_deviceName);
+            setResult(Activity.RESULT_OK, i);
+            finish();
+
         }
         catch (Exception e)
         {
             Log.w("UareUSampleJava", "error during reader shutdown");
+            Utils.saveErrorInStorage("Error during reader shutdown");
+
+            Intent i = new Intent();
+            i.putExtra("device_name", m_deviceName);
+            setResult(Activity.RESULT_OK, i);
+            finish();
         }
 
-        Intent i = new Intent();
-        i.putExtra("device_name", m_deviceName);
-        setResult(Activity.RESULT_OK, i);
-        finish();
     }
 
     // called when orientation has changed to manually destroy and recreate activity
@@ -563,6 +583,9 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
 
         } catch (Exception e) {
 
+            Toast.makeText(getApplicationContext(), "Ocurrió un error al escribir el archivo",
+                    Toast.LENGTH_SHORT).show();
+            Utils.saveErrorInStorage(e.getMessage());
             e.printStackTrace();
 
         }

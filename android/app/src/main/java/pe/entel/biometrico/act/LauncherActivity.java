@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import android.hardware.usb.UsbDevice;
@@ -46,6 +47,8 @@ public class LauncherActivity extends Activity {
 
     private Button m_morpho;
     private Button m_eikon;
+    private TextView m_login_version;
+
     private static String TAG = "LauncherActivity";
     private static String OUTPUT_FILE_EXTENSION = ".txt";
     private static final String ACTION_USB_PERMISSION = "com.digitalpersona.uareu.dpfpddusbhost.USB_PERMISSION";
@@ -78,6 +81,11 @@ public class LauncherActivity extends Activity {
         m_morpho = (Button) findViewById(R.id.launch_morpho);
         m_eikon = (Button) findViewById(R.id.launch_eikon);
 
+        m_login_version = (TextView) findViewById(R.id.login_version);
+
+
+        m_login_version.setText(Utils.fnVersion(this));
+
         m_morpho.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v)
             {
@@ -104,6 +112,7 @@ public class LauncherActivity extends Activity {
         } else if (eikon_step == 1){
             Intent i = new Intent(LauncherActivity.this, CaptureFingerprintActivity.class);
             i.putExtra("device_name", m_deviceName);
+            i.putExtra("instructions", "");
             startActivityForResult(i, eikon_step);
         }
 

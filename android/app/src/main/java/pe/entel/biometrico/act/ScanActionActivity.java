@@ -102,6 +102,8 @@ public class ScanActionActivity extends Activity {
 
                     Toast.makeText(getApplicationContext(), obj.deError,
                             Toast.LENGTH_SHORT).show();
+                    //Morpho Error
+                    Utils.saveErrorInStorage(obj.deError);
                     finish();
                 }
 
@@ -137,7 +139,7 @@ public class ScanActionActivity extends Activity {
         {
             Toast.makeText(getApplicationContext(), "No data on activity result",
                     Toast.LENGTH_SHORT).show();
-            //displayReaderNotFound();
+            Utils.saveErrorInStorage("No data on activity result of ScanAction");
             return;
         }
 
@@ -152,8 +154,6 @@ public class ScanActionActivity extends Activity {
 
                 if((m_deviceName != null) && !m_deviceName.isEmpty())
                 {
-                    //m_selectedDevice.setText("Device: " + m_deviceName);
-
                     try {
                         Context applContext = getApplicationContext();
                         m_reader = Globals.getInstance().getReader(m_deviceName, applContext);
@@ -173,38 +173,28 @@ public class ScanActionActivity extends Activity {
                         }
                     } catch (UareUException e1)
                     {
-                        Toast.makeText(getApplicationContext(), e1.getMessage(),
+                        Toast.makeText(getApplicationContext(), e1.toString(),
                                 Toast.LENGTH_SHORT).show();
+                        Utils.saveErrorInStorage(e1.toString());
                     }
                     catch (DPFPDDUsbException e)
                     {
-                        Toast.makeText(getApplicationContext(), e.getMessage(),
+                        Toast.makeText(getApplicationContext(), e.toString(),
                                 Toast.LENGTH_SHORT).show();
+                        Utils.saveErrorInStorage( e.toString());
                     }
 
                 } else
                 {
-                    Toast.makeText(getApplicationContext(), "device name is empty",
+                    Toast.makeText(getApplicationContext(), "Device name was not obtained",
                             Toast.LENGTH_SHORT).show();
+                    Utils.saveErrorInStorage("Device name was not obtained");
                 }
 
                 break;
             case 1:
                 Log.i(TAG, "ON RESULT OF SCAN");
                 finish();
-
-                /*if(resultCode == Activity.RESULT_OK){
-                    Log.i(TAG, "RESULT OF SCAN STATUS - OK");
-                    Toast.makeText(getApplicationContext(), "Archivo Guardado",
-                            Toast.LENGTH_SHORT).show();
-                    finish();
-
-                }else{
-                    Log.i(TAG, "RESULT OF SCAN STATUS - FAILED from capture method");
-                    Toast.makeText(getApplicationContext(), "Ocurrió un error guardando el archivo",
-                            Toast.LENGTH_SHORT).show();
-                    finish();
-                }*/
                 break;
         }
     }

@@ -2,12 +2,22 @@ package pe.entel.biometrico.util;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
+import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileOutputStream;
 
 import biometrico.entel.pe.BuildConfig;
 
 public class Utils {
+
+    private static String LOG_TAG = "Utils";
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -66,6 +76,21 @@ public class Utils {
         return respuesta;
     }
 
+    private static String rutaArchivoError() {
+        String respuesta = "/Android/data/com.outsystemsenterprise.entel.PEMayorista/files/entelError/";
+
+        if (BuildConfig.FLAVOR.equals("dev")) {
+            respuesta = "/Android/data/com.outsystemsenterprise.enteldev.PEMayorista/files/entelError/";
+        } else if (BuildConfig.FLAVOR.equals("tst")) {
+            respuesta = "/Android/data/com.outsystemsenterprise.enteltst.PEMayorista/files/entelError/";
+        }else if (BuildConfig.FLAVOR.equals("pp")) {
+            respuesta = "/Android/data/com.outsystemsenterprise.entelpp.PEMayorista/files/entelError/";
+        }
+
+        return respuesta;
+    }
+
+
     public static String cualBuild() {
         String respuesta = "NIGUNO";
 
@@ -94,5 +119,74 @@ public class Utils {
                     REQUEST_EXTERNAL_STORAGE
             );
         }
+    }
+
+    public static void saveErrorInStorage(String ErrorMessage){
+
+
+        try {
+
+            String nombre = "error.txt";
+
+            String strFolder = Environment.getExternalStorageDirectory() + Utils.rutaArchivoError();
+
+
+
+            File folder = new File(strFolder);
+            boolean success = true;
+            if (!folder.exists()) {
+                //Toast.makeText(MainActivity.this, "Directory Does Not Exist, Create It", Toast.LENGTH_SHORT).show();
+                success = folder.mkdir();
+            }
+
+
+            File file = new File(strFolder, nombre);
+
+            file.createNewFile();
+            FileOutputStream stream = new FileOutputStream(file);
+            try {
+
+                stream.write(ErrorMessage.getBytes());
+            } finally {
+                stream.close();
+            }
+
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            Log.e(LOG_TAG,e.getMessage());
+
+        }
+
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+    public static String fnVersion(Context poContext) {
+        String lsVersion = "";
+        PackageInfo loPackageInfo = null;
+        try {
+            loPackageInfo = poContext.getPackageManager().getPackageInfo(
+                    poContext.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            Log.v(LOG_TAG, "Verificar el manifest: " + e.getMessage());
+            return "ERROR VERSION";
+        }
+
+        lsVersion = loPackageInfo.versionName;
+
+        return lsVersion;
     }
 }
