@@ -518,7 +518,7 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
         catch (Exception e)
         {
             Log.w("UareUSampleJava", "error during reader shutdown");
-            Utils.saveErrorInStorage("Error during reader shutdown");
+            //Utils.saveErrorInStorage("Error during reader shutdown");
 
             Intent i = new Intent();
             i.putExtra("device_name", m_deviceName);
