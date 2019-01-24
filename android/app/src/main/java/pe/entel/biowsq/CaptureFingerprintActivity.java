@@ -222,7 +222,9 @@ public class CaptureFingerprintActivity extends Activity {
 
             Intent i = new Intent();
             i.putExtra("m_deviceName",m_deviceName);
+
             Log.i(LOG_TAG,"Ocurrió un error al procesar la huella ");
+            Utils.saveErrorInStorage("Ocurrió un error al procesar la huella ");
             setResult(Activity.RESULT_CANCELED, i);
             finish();
 
