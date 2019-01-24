@@ -83,6 +83,7 @@ public class CaptureFingerprintActivity extends Activity {
         catch (Exception e)
         {
             Log.w("UareUSampleJava", "error during init of reader");
+            Utils.saveErrorInStorage("error during init of reader");
             m_deviceName = "";
             onBackPressed();
             return;
@@ -118,6 +119,7 @@ public class CaptureFingerprintActivity extends Activity {
                     if(!m_reset)
                     {
                         Log.w("UareUSampleJava", "error during capture: " + e.toString());
+                        Utils.saveErrorInStorage("error during capture:" + e.toString());
                         m_deviceName = "";
                         onBackPressed();
                     }
@@ -182,6 +184,7 @@ public class CaptureFingerprintActivity extends Activity {
                 m_reader.Close();
             } catch (UareUException e) {
                 e.printStackTrace();
+                Utils.saveErrorInStorage(e.toString());
             }
 
 
@@ -223,8 +226,9 @@ public class CaptureFingerprintActivity extends Activity {
             Intent i = new Intent();
             i.putExtra("m_deviceName",m_deviceName);
 
-            Log.i(LOG_TAG,"Ocurrió un error al procesar la huella ");
             Utils.saveErrorInStorage("Ocurrió un error al procesar la huella ");
+
+            Log.i(LOG_TAG,"Ocurrió un error al procesar la huella ");
             setResult(Activity.RESULT_CANCELED, i);
             finish();
 
@@ -358,9 +362,11 @@ public class CaptureFingerprintActivity extends Activity {
 
         } catch (UareUException e) {
             Log.e("Util", "UareUException..." + e);
+            Utils.saveErrorInStorage(e.toString());
             return null;
         } catch (Exception e) {
             Log.e("Util", "Exception..." + e);
+            Utils.saveErrorInStorage(e.getMessage());
             return null;
         }
 
