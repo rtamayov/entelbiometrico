@@ -151,7 +151,10 @@ public class CaptureFingerprintActivity extends Activity {
             Log.w("UareUSampleJava", "error during reader shutdown");
         }
 
-
+        Intent i = new Intent();
+        i.putExtra("device_name", m_deviceName);
+        setResult(Activity.RESULT_OK, i);
+        finish();
     }
 
     // called when orientation has changed to manually destroy and recreate activity
