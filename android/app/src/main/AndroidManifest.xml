@@ -55,6 +55,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name="pe.entel.biometrico.act.JSGDActivity" />
     </application>
 
 </manifest>

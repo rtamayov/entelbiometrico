@@ -369,7 +369,7 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
 
                 if(instructions.isEmpty() || instructions == "" || instructions == null){
 
-                    Log.i(LOG_TAG,"Used from launcher - Not Saving Image");
+                    Log.i(LOG_TAG,"Used from activity_secugen - Not Saving Image");
                     Toast.makeText(getApplicationContext(), "Correcto",
                             Toast.LENGTH_SHORT).show();
                     setResult(Activity.RESULT_OK, i);

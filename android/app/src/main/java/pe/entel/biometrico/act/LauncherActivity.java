@@ -1,18 +1,16 @@
 package pe.entel.biometrico.act;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,9 +18,6 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbManager;
 
 import com.digitalpersona.uareu.Reader;
 import com.digitalpersona.uareu.UareUException;
@@ -32,8 +27,6 @@ import com.zy.lib.morpho.ui.BioCapture;
 import com.zy.lib.morpho.ui.IBioCapture;
 import com.zy.lib.morpho.ui.ZyRequest;
 import com.zy.lib.morpho.ui.ZyResponse;
-
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -47,12 +40,13 @@ public class LauncherActivity extends Activity {
 
     private Button m_morpho;
     private Button m_eikon;
+    private Button m_secugen;
     private TextView m_login_version;
 
     private static String TAG = "LauncherActivity";
     private static String OUTPUT_FILE_EXTENSION = ".txt";
     private static final String ACTION_USB_PERMISSION = "com.digitalpersona.uareu.dpfpddusbhost.USB_PERMISSION";
-    private String file_name = "test";
+    private String file_name = "morpho";
     private String eikon_serial_number = "";
     private String m_deviceName = "";
     private int eikon_step = 0;
@@ -60,18 +54,12 @@ public class LauncherActivity extends Activity {
     private final int CONSMENCONFIGURACION = 1;
 
 
-
-
-
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
        /* Toast.makeText(getApplicationContext(), Utils.rutaArchivo(),
                 Toast.LENGTH_SHORT).show();*/
-
-
 
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -80,15 +68,15 @@ public class LauncherActivity extends Activity {
 
         m_morpho = (Button) findViewById(R.id.launch_morpho);
         m_eikon = (Button) findViewById(R.id.launch_eikon);
+        m_secugen = (Button) findViewById(R.id.launch_secugen);
 
         m_login_version = (TextView) findViewById(R.id.login_version);
 
 
         m_login_version.setText(Utils.fnVersion(this));
 
-        m_morpho.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v)
-            {
+        m_morpho.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
                 initializeMorpho();
             }
         });
@@ -100,19 +88,26 @@ public class LauncherActivity extends Activity {
             }
         });
 
+        m_secugen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initalizeSecugen();
+            }
+        });
+
         Utils.verifyStoragePermissions(this);
     }
 
-    private void initializeEikon(){
-        if(eikon_step == 0){
+    private void initializeEikon() {
+        if (eikon_step == 0) {
             Intent i = new Intent(LauncherActivity.this, GetReaderActivity.class);
             i.putExtra("device_name", m_deviceName);
             i.putExtra("parent_activity", "ScanActionActivity");
             startActivityForResult(i, eikon_step);
-        } else if (eikon_step == 1){
+        } else if (eikon_step == 1) {
             Intent i = new Intent(LauncherActivity.this, CaptureFingerprintActivity.class);
             i.putExtra("device_name", m_deviceName);
-            i.putExtra("instructions", "");
+            i.putExtra("instructions", "eikon");
             startActivityForResult(i, eikon_step);
         }
 
@@ -121,13 +116,15 @@ public class LauncherActivity extends Activity {
     private void initializeMorpho() {
         IBioCapture iBioCapture = new BioCapture(this, new IBioCapture.ICallback() {
             @Override
-            public void onStart() {}
+            public void onStart() {
+            }
 
             @Override
-            public void onComplete() {}
+            public void onComplete() {
+            }
 
             @Override
-            public void onSuccess(ZyResponse zyResponse)  {
+            public void onSuccess(ZyResponse zyResponse) {
                 saveWSQ(formatWsqToBase64(zyResponse.wsq));
             }
 
@@ -136,7 +133,7 @@ public class LauncherActivity extends Activity {
 
                 Toast.makeText(getApplicationContext(), obj.deError,
                         Toast.LENGTH_SHORT).show();
-                if(obj.deError.contains("19005")){
+                if (obj.deError.contains("19005")) {
                     //scan_step = 1;
                     //initializeEikon();
                 }
@@ -146,11 +143,16 @@ public class LauncherActivity extends Activity {
         iBioCapture.capturar(zyRequest);
     }
 
+    private void initalizeSecugen() {
+        Intent intent = new Intent(LauncherActivity.this, JSGDActivity.class);
+        intent.putExtra("device_name", m_deviceName);
+        intent.putExtra("instructions", "secugen");
+        startActivityForResult(intent, 1);
+    }
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        if (data == null)
-        {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data == null) {
             //displayReaderNotFound();
             return;
         }
@@ -158,12 +160,10 @@ public class LauncherActivity extends Activity {
         Globals.ClearLastBitmap();
         m_deviceName = (String) data.getExtras().get("device_name");
 
-        switch (requestCode)
-        {
+        switch (requestCode) {
             case 0:
 
-                if((m_deviceName != null) && !m_deviceName.isEmpty())
-                {
+                if ((m_deviceName != null) && !m_deviceName.isEmpty()) {
                     //m_selectedDevice.setText("Device: " + m_deviceName);
 
                     try {
@@ -176,25 +176,20 @@ public class LauncherActivity extends Activity {
                             IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
                             applContext.registerReceiver(mUsbReceiver, filter);
 
-                            if(DPFPDDUsbHost.DPFPDDUsbCheckAndRequestPermissions(applContext, mPermissionIntent, m_deviceName))
-                            {
+                            if (DPFPDDUsbHost.DPFPDDUsbCheckAndRequestPermissions(applContext, mPermissionIntent, m_deviceName)) {
                                 //CheckDevice();
                                 eikon_step = 1;
                                 m_eikon.setText("Eikon 1");
                                 initializeEikon();
                             }
                         }
-                    } catch (UareUException e1)
-                    {
+                    } catch (UareUException e1) {
                         //displayReaderNotFound();
-                    }
-                    catch (DPFPDDUsbException e)
-                    {
+                    } catch (DPFPDDUsbException e) {
                         //displayReaderNotFound();
                     }
 
-                } else
-                {
+                } else {
                     //displayReaderNotFound();
                 }
 
@@ -202,23 +197,22 @@ public class LauncherActivity extends Activity {
             case 1:
                 Log.i(TAG, "ON RESULT OF SCAN");
 
-                if(resultCode == Activity.RESULT_OK){
+                if (resultCode == Activity.RESULT_OK) {
                     Log.i(TAG, "RESULT OF SCAN STATUS - OK");
 
                     String wsqBase64 = data.getStringExtra("wsqBase64");
 
-                    Log.i(TAG,"wsqBase64: "+wsqBase64);
+                    Log.i(TAG, "wsqBase64: " + wsqBase64);
 
                     try {
-                        saveWSQ(wsqBase64);
+                        //saveWSQ(wsqBase64);
                         eikon_step = 0;
                         m_eikon.setText("Eikon");
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
-                        Log.i(TAG, "RESULT OF SCAN STATUS - FAILED: "+ e);
+                        Log.i(TAG, "RESULT OF SCAN STATUS - FAILED: " + e);
                     }
-                }else{
+                } else {
                     Log.i(TAG, "RESULT OF SCAN STATUS - FAILED from capture method");
                 }
                 break;
@@ -226,31 +220,27 @@ public class LauncherActivity extends Activity {
     }
 
 
-
-
-
-
-    private void saveWSQ(String response){
-        Log.i(TAG,"saveWSQ:init");
-        try{
-            File file = new File( Environment.getExternalStorageDirectory() +"/Android/data/com.outsystemscloud.roberttamayo.AbrirNativa/files/A/B/C/D/E/MyDocs/", file_name + OUTPUT_FILE_EXTENSION);
-            Log.i(TAG,"saveWSQ:file2save: " + file.getAbsolutePath());
+    private void saveWSQ(String response) {
+        Log.i(TAG, "saveWSQ:init");
+        try {
+            File file = new File(Environment.getExternalStorageDirectory() + Utils.rutaArchivo(), file_name + OUTPUT_FILE_EXTENSION);
+            Log.i(TAG, "saveWSQ:file2save: " + file.getAbsolutePath());
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(response.getBytes());
             fos.close();
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG,"saveWSQ:IOExcp res: "+e);
-        } catch (Exception e){
+            Log.e(TAG, "saveWSQ:IOExcp res: " + e);
+        } catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG,"saveWSQ:AllExcp res: "+e);
+            Log.e(TAG, "saveWSQ:AllExcp res: " + e);
         }
         Toast.makeText(this.getApplicationContext(), "File Saved",
                 Toast.LENGTH_SHORT).show();
-        Log.i(TAG,"saveWSQ:end");
+        Log.i(TAG, "saveWSQ:end");
     }
 
-    public static String formatWsqToBase64(byte[] wsq){
+    public static String formatWsqToBase64(byte[] wsq) {
         if (wsq == null) {
             return null;
         }
@@ -287,26 +277,18 @@ public class LauncherActivity extends Activity {
         return new String(dest);
     }
 
-    private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver()
-    {
-        public void onReceive(Context context, Intent intent)
-        {
+    private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (ACTION_USB_PERMISSION.equals(action))
-            {
-                synchronized (this)
-                {
-                    UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false))
-                    {
-                        if(device != null)
-                        {
+            if (ACTION_USB_PERMISSION.equals(action)) {
+                synchronized (this) {
+                    UsbDevice device = (UsbDevice) intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                        if (device != null) {
                             //call method to set up device communication
                             //CheckDevice();
                         }
-                    }
-                    else
-                    {
+                    } else {
                         //setButtonsEnabled(false);
                     }
                 }
@@ -317,7 +299,7 @@ public class LauncherActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, CONSMENCONFIGURACION, 0,
-               "Administración").setIcon(
+                "Administración").setIcon(
                 R.drawable.ic_my_library_books);
         return true;
     }
