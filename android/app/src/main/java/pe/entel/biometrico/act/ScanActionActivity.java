@@ -26,6 +26,9 @@ import com.zy.lib.morpho.ui.ZyResponse;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import SecuGen.FDxSDKPro.JSGFPLib;
+import SecuGen.FDxSDKPro.SGFDxDeviceName;
+import SecuGen.FDxSDKPro.SGFDxErrorCode;
 import biometrico.entel.pe.R;
 import pe.entel.biometrico.util.Globals;
 import pe.entel.biometrico.util.Utils;
@@ -40,7 +43,7 @@ public class ScanActionActivity extends Activity {
 
     private String m_deviceName = "";
     private int eikon_step = 0;
-
+    private JSGFPLib sgfplib;
 
     Reader m_reader;
 
@@ -48,7 +51,7 @@ public class ScanActionActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
+        sgfplib = new JSGFPLib((UsbManager) getSystemService(Context.USB_SERVICE));
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.activity_scan);
@@ -64,9 +67,16 @@ public class ScanActionActivity extends Activity {
         instructions = instructions.substring(2, instructions.length()-2);
 
         Log.v("XXX", instructions);
+        long error = sgfplib.Init(SGFDxDeviceName.SG_DEV_AUTO);
+
+        if (error == SGFDxErrorCode.SGFDX_ERROR_NONE) {
+            initalizeSecugen();
+        }else{
+            initializeMorpho();
+        }
 
 
-        initializeMorpho();
+
 
     }
 
@@ -131,6 +141,13 @@ public class ScanActionActivity extends Activity {
         }
 
 
+    }
+
+    private void initalizeSecugen() {
+        Intent intent = new Intent(ScanActionActivity.this, JSGDActivity.class);
+        intent.putExtra("device_name", m_deviceName);
+        intent.putExtra("instructions", instructions);
+        startActivityForResult(intent, 1);
     }
 
     @Override

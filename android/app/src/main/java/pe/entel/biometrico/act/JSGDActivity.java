@@ -590,7 +590,7 @@ public class JSGDActivity extends Activity
 
         if (v == mButtonClose)
         {
-            onDestroy();
+            onBackPressed();
         }
 
         if (v == mToggleButtonSmartCapture) {
@@ -908,5 +908,13 @@ public class JSGDActivity extends Activity
             dest[idx] = (byte) 61;
         }
         return new String(dest);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent();
+        i.putExtra("device_name", m_deviceName);
+        setResult(Activity.RESULT_OK, i);
+        finish();
     }
 }
