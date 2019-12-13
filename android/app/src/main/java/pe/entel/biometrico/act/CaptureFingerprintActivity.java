@@ -447,9 +447,9 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
         CompressionImpl comp = new CompressionImpl();
         try {
             comp.Start();
-            comp.SetWsqBitrate(500, 0);
+            comp.SetWsqBitrate(200, 1);
 
-            byte[] rawCompress = comp.CompressRaw(arrayT, redimWSQ.getWidth(), redimWSQ.getHeight(), 500, 8,
+            byte[] rawCompress = comp.CompressRaw(arrayT, 512, 512, 500, 8,
                     Compression.CompressionAlgorithm.COMPRESSION_WSQ_NIST);
 
             comp.Finish();
