@@ -345,6 +345,7 @@ public class CaptureFingerprintActivity extends Activity implements OnItemSelect
 
         //WSQ IN B64
         //grab capture result and convert it into wsq as bytearray
+
         Fid ISOFid = cap_result.image;
         byte[] wsqRawCompress = processImage(ISOFid.getViews()[0].getData(),ISOFid.getViews()[0].getWidth(), ISOFid.getViews()[0].getHeight());
         String wsqBase64 = Utils.formatWsqToBase64(wsqRawCompress);
